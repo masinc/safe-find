@@ -5,7 +5,7 @@
  */
 
 // Dangerous options that allow arbitrary command execution or destructive operations
-export const DANGEROUS_OPTIONS = new Set([
+export const DANGEROUS_OPTIONS: Set<string> = new Set([
   "-exec", // Execute arbitrary commands
   "-execdir", // Execute commands in file's directory
   "-ok", // Interactive command execution

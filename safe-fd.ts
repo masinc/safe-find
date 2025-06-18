@@ -5,7 +5,7 @@
  */
 
 // Dangerous options that allow arbitrary command execution
-export const DANGEROUS_OPTIONS = new Set([
+export const DANGEROUS_OPTIONS: Set<string> = new Set([
   "-x",
   "--exec",
   "-X",
