@@ -5,9 +5,8 @@
 ## 🚀 クイックスタート
 
 ```bash
-# 両方のツールをインストール
-deno install -g --allow-run jsr:@masinc/safe-find/safe-find
-deno install -g --allow-run jsr:@masinc/safe-find/safe-fd
+# 両方のツールをインストール（各361KB！）
+cargo install safe-find
 
 # 通常のfind/fdコマンドと同じように使用
 safe-find . -name "*.txt" -type f
@@ -49,17 +48,26 @@ safe-fd "*.tmp" -x rm              # ❌ ブロック
 
 ### 前提条件
 
-- [Deno](https://deno.land/) 2.x 以降
+- [Rust](https://rustup.rs/)（ソースからビルドする場合）またはプリビルドバイナリを使用
 
-### JSRからのインストール
+### Crates.ioからのインストール（推奨）
 
 ```bash
-# safe-findをインストール
-deno install -g --allow-run jsr:@masinc/safe-find/safe-find
-
-# safe-fdをインストール
-deno install -g --allow-run jsr:@masinc/safe-find/safe-fd
+# safe-findとsafe-fdの両方をインストール
+cargo install safe-find
 ```
+
+### ソースからのインストール
+
+```bash
+git clone https://github.com/masinc/safe-find.git
+cd safe-find
+cargo install --path .
+```
+
+### プリビルドバイナリ
+
+[GitHub Releases](https://github.com/masinc/safe-find/releases)からプラットフォーム固有のバイナリ（各361KB）をダウンロード。
 
 ## 🔧 使用方法
 
@@ -101,11 +109,12 @@ safe-fd --ignore-case "readme"
 
 ## ⚡ パフォーマンス
 
-safe-findとsafe-fdは最小限のオーバーヘッドしか追加しません：
+**非常に軽量で高速：**
 
-- 引数解析: ~1ms
-- セキュリティフィルタリング: ~1ms
-- 元のコマンド実行: ネイティブと同じ
+- **バイナリサイズ**: 各361KB（Deno版より98.3%小さい）
+- **ゼロ依存関係**: 外部ライブラリ不要
+- **瞬時起動**: ネイティブコマンドと比較してほぼゼロオーバーヘッド
+- **メモリ効率**: 最小限のメモリフットプリント
 
 ## 🧪 出力例
 
@@ -130,17 +139,23 @@ git clone https://github.com/masinc/safe-find.git
 cd safe-find
 
 # テスト実行
-deno task test
+cargo test
 
-# 統合テスト実行
-deno task test:integration
+# フォーマットチェック
+cargo fmt --check
 
-# 全テスト実行
-deno task test:all
+# リンター実行
+cargo clippy -- -D warnings
+
+# デバッグビルド
+cargo build
+
+# 最適化リリースビルド
+cargo build --release
 
 # ローカルでテスト
-deno run --allow-run safe-find.ts . -name "*.ts"
-deno run --allow-run safe-fd.ts "*.md"
+cargo run --bin safe-find . -name "*.rs"
+cargo run --bin safe-fd "*.md"
 ```
 
 ## 📚 使用例
@@ -162,10 +177,9 @@ AIアシスタンスで安全なファイル操作を有効にするため、プ
 
 ### インストール
 
-fdがインストール済みの場合:
-`deno install -g --allow-run jsr:@masinc/safe-find/safe-fd`
-
-fdがない場合: `deno install -g --allow-run jsr:@masinc/safe-find/safe-find`
+```bash
+cargo install safe-find
+```
 
 ### Claude Code ツール設定
 
@@ -209,9 +223,10 @@ MITライセンス
 
 ### プロジェクトリンク
 
-- [JSRパッケージ](https://jsr.io/@masinc/safe-find)
+- [Crates.ioパッケージ](https://crates.io/crates/safe-find)
 - [GitHubリポジトリ](https://github.com/masinc/safe-find)
 - [Issues・バグレポート](https://github.com/masinc/safe-find/issues)
+- [リリース・バイナリ](https://github.com/masinc/safe-find/releases)
 
 ### 元のコマンド
 

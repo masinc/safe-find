@@ -4,44 +4,44 @@ This document describes the deployment and release process for safe-find.
 
 ## 🚀 Release Process Overview
 
-The project uses automated CI/CD with GitHub Actions and JSR (JavaScript
-Registry) for publishing.
+The project uses automated CI/CD with GitHub Actions and Crates.io for publishing Rust binaries.
 
 ### Release Flow
 
 1. **Development** → Code changes and tests
-2. **CI Validation** → Automated testing on PR/push
+2. **CI Validation** → Automated testing on PR/push (cargo test, fmt, clippy)
 3. **Version Tag** → Create version tag (triggers release)
-4. **Automated Publishing** → JSR publication via GitHub Actions
+4. **Automated Publishing** → Crates.io publication + GitHub Releases with cross-platform binaries
 
 ## 📋 Pre-Release Checklist
 
 Before creating a release, ensure:
 
-- [ ] All tests pass locally: `deno task test:all`
-- [ ] Integration tests pass: `deno task test:integration`
-- [ ] Code is properly formatted: `deno fmt --check`
-- [ ] No linting errors: `deno lint`
+- [ ] All tests pass locally: `cargo test`
+- [ ] Code is properly formatted: `cargo fmt --check`
+- [ ] No linting errors: `cargo clippy -- -D warnings`
+- [ ] Release build succeeds: `cargo build --release`
 - [ ] Documentation is updated (README.md, README.ja.md, CLAUDE.md)
 - [ ] CHANGELOG.md is updated (if exists)
 - [ ] Version number follows [Semantic Versioning](https://semver.org/)
+- [ ] Crates.io publish check passes: `cargo publish --dry-run`
 
 ## 🔄 Release Steps
 
 ### 1. Update Version
 
-Edit `deno.jsonc` to update the version:
+Edit `Cargo.toml` to update the version:
 
-```jsonc
-{
-  "version": "x.y.z" // Update this
-}
+```toml
+[package]
+name = "safe-find"
+version = "x.y.z"  # Update this
 ```
 
 ### 2. Commit Version Change
 
 ```bash
-git add deno.jsonc
+git add Cargo.toml
 git commit -m "Release vx.y.z: Brief description of changes
 
 🤖 Generated with [Claude Code](https://claude.ai/code)
@@ -80,62 +80,62 @@ gh run view <run-id>
 
 - **Triggers**: Push to main, Pull Requests
 - **Jobs**:
-  - Unit tests (`deno test`)
-  - Integration tests (`deno task test:integration`)
-  - Code formatting check (`deno fmt --check`)
-  - Linting (`deno lint`)
-  - Type checking (`deno check`)
+  - Unit tests (`cargo test`)
+  - Code formatting check (`cargo fmt --check`)
+  - Linting (`cargo clippy -- -D warnings`)
+  - Release build test (`cargo build --release`)
 
 #### `publish.yml` - Release Publishing
 
 - **Triggers**: Tag push (`v*`)
 - **Jobs**:
-  1. **test**: Runs full test suite (reuses `test.yml`)
-  2. **publish**: Publishes to JSR (only after tests pass)
-
-#### `test.yml` - Reusable Test Workflow
-
-- **Purpose**: Shared test logic for CI and publish workflows
-- **Jobs**: Unit tests + Integration tests
+  1. **test**: Runs full test suite (cargo test + fmt + clippy)
+  2. **build-binaries**: Cross-platform binary builds for 4 targets
+  3. **publish**: Publishes to Crates.io (only after tests pass)
+  4. **release**: Creates GitHub Release with binary assets
 
 ### Required Permissions
 
 The publish workflow requires these permissions:
 
-- `contents: read` - Read repository content
-- `id-token: write` - OIDC token for JSR authentication
+- `contents: read` - Read repository content  
+- `contents: write` - Create GitHub releases
+- Secret: `CARGO_REGISTRY_TOKEN` - Crates.io API token for publishing
 
-## 📦 JSR Publishing
+## 📦 Crates.io Publishing
 
 ### Package Configuration
 
-The package is configured in `deno.jsonc`:
+The package is configured in `Cargo.toml`:
 
-```jsonc
-{
-  "name": "@masinc/safe-find",
-  "version": "x.y.z",
-  "license": "MIT",
-  "exports": {
-    "./safe-find": "./safe-find.ts",
-    "./safe-fd": "./safe-fd.ts"
-  },
-  "bin": {
-    "safe-find": "deno run --allow-run ./safe-find.ts",
-    "safe-fd": "deno run --allow-run ./safe-fd.ts"
-  }
-}
+```toml
+[package]
+name = "safe-find"
+version = "x.y.z"
+edition = "2021"
+license = "MIT"
+description = "Safe wrappers for find and fd commands that block dangerous execution options"
+repository = "https://github.com/masinc/safe-find"
+
+[[bin]]
+name = "safe-find"
+path = "src/bin/safe-find.rs"
+
+[[bin]]
+name = "safe-fd"
+path = "src/bin/safe-fd.rs"
 ```
 
 ### Publication Details
 
-- **Registry**: [JSR (JavaScript Registry)](https://jsr.io)
-- **Package URL**: https://jsr.io/@masinc/safe-find
+- **Registry**: [Crates.io](https://crates.io)
+- **Package URL**: https://crates.io/crates/safe-find
 - **Installation**:
   ```bash
-  deno install -g --allow-run jsr:@masinc/safe-find/safe-find
-  deno install -g --allow-run jsr:@masinc/safe-find/safe-fd
+  cargo install safe-find
   ```
+- **Binary Size**: 361KB per binary (extremely lightweight)
+- **Supported Platforms**: Linux, Windows, macOS (x86_64 + ARM64)
 
 ## 🔧 Manual Release (Emergency)
 
@@ -143,8 +143,8 @@ If automated release fails, you can publish manually:
 
 ### Prerequisites
 
-1. Ensure you have JSR publish permissions
-2. Deno 2.x installed locally
+1. Ensure you have Crates.io publish permissions (`cargo login`)
+2. Rust toolchain installed locally
 
 ### Steps
 
@@ -153,10 +153,17 @@ If automated release fails, you can publish manually:
 git checkout vx.y.z
 
 # 2. Run tests locally
-deno task test:all
+cargo test
 
-# 3. Publish to JSR
-deno publish
+# 3. Check formatting and linting
+cargo fmt --check
+cargo clippy -- -D warnings
+
+# 4. Test publish (dry run)
+cargo publish --dry-run
+
+# 5. Publish to Crates.io
+cargo publish
 ```
 
 ## 🐛 Troubleshooting
@@ -167,31 +174,35 @@ deno publish
 
 - **Symptom**: CI fails on test step
 - **Solution**: Fix failing tests before release
-- **Command**: `deno task test:all` to reproduce locally
+- **Command**: `cargo test` to reproduce locally
 
-#### 2. Linting Errors
+#### 2. Linting/Formatting Errors
 
-- **Symptom**: CI fails on linting step
-- **Solution**: Fix linting issues
+- **Symptom**: CI fails on fmt/clippy step
+- **Solution**: Fix formatting/linting issues
 - **Commands**:
   ```bash
-  deno lint          # Check issues
-  deno fmt           # Auto-fix formatting
+  cargo clippy -- -D warnings  # Check clippy issues
+  cargo fmt                     # Auto-fix formatting
   ```
 
-#### 3. JSR Publication Failures
+#### 3. Crates.io Publication Failures
 
 - **Symptom**: Publish step fails
 - **Common causes**:
-  - Missing `exports` field in `deno.jsonc`
-  - Invalid package configuration
+  - Missing/invalid `Cargo.toml` metadata
+  - Version already exists on Crates.io
   - Network issues
-- **Solution**: Check JSR error logs in GitHub Actions
+  - Authentication failure (`CARGO_REGISTRY_TOKEN`)
+- **Solution**: Check Crates.io error logs in GitHub Actions
 
-#### 4. Permission Issues
+#### 4. Binary Build Failures
 
-- **Symptom**: `id-token: write` permission denied
-- **Solution**: Ensure repository has proper OIDC configuration
+- **Symptom**: Cross-platform build fails
+- **Common causes**:
+  - Platform-specific compilation issues
+  - Missing target toolchain
+- **Solution**: Check build logs for specific target failures
 
 ### Debug Commands
 
@@ -202,8 +213,11 @@ gh run list --limit 5
 # View failed workflow logs
 gh run view <run-id> --log-failed
 
-# Check JSR package status
-curl https://jsr.io/@masinc/safe-find
+# Check Crates.io package status
+curl https://crates.io/api/v1/crates/safe-find
+
+# Test local publish
+cargo publish --dry-run
 ```
 
 ## 📊 Version Strategy
@@ -235,8 +249,9 @@ After successful release:
 
 1. **Verify Installation**:
    ```bash
-   deno install -g --allow-run jsr:@masinc/safe-find/safe-find
-   safe-find --version  # Should show new version
+   cargo install safe-find
+   safe-find --help  # Should work with new version
+   safe-fd --help    # Should work with new version
    ```
 
 2. **Update Documentation**: Ensure all docs reflect the new version
@@ -247,7 +262,8 @@ After successful release:
 
 ## 🔗 Related Resources
 
-- [JSR Documentation](https://jsr.io/docs)
+- [Crates.io Documentation](https://doc.rust-lang.org/cargo/reference/publishing.html)
 - [GitHub Actions Documentation](https://docs.github.com/en/actions)
 - [Semantic Versioning](https://semver.org/)
-- [Deno Publishing Guide](https://docs.deno.com/runtime/fundamentals/publishing/)
+- [Rust Cross-compilation Guide](https://rust-lang.github.io/rustup/cross-compilation.html)
+- [GitHub Releases Documentation](https://docs.github.com/en/repositories/releasing-projects-on-github)

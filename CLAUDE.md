@@ -5,47 +5,47 @@
 
 ## プロジェクト概要
 
-これは "safe-find" という名前のDeno
-TypeScriptプロジェクトです。このプロジェクトは `find` と `fd`
-コマンドの安全なラッパーである `safe-find` と `safe-fd`
-を提供します。これらのラッパーは、元のコマンドの危険な `-exec`
-系オプション（`-exec`, `-execdir`, `-delete`
-など）を無効化し、セキュリティリスクを軽減します。
+これは "safe-find" という名前のRustプロジェクトです。このプロジェクトは `find` と `fd` コマンドの安全なラッパーである `safe-find` と `safe-fd` を提供します。これらのラッパーは、元のコマンドの危険な `-exec` 系オプション（`-exec`, `-execdir`, `-delete` など）を無効化し、セキュリティリスクを軽減します。
 
-プロジェクトは `mise.toml` で指定されているDeno
-2.xをランタイム管理に使用し、JSRで公開されています。
+プロジェクトはRustで実装され、crates.ioで公開されています。バイナリサイズは361KBと非常に軽量で、ゼロ依存関係で動作します。
 
 ## 開発コマンド
 
-- **safe-findの実行**: `deno run --allow-run safe-find.ts`
-- **safe-fdの実行**: `deno run --allow-run safe-fd.ts`
-- **テストの実行**: `deno task test` (または `deno test`)
-- **テストのウォッチモード**: `deno task test:watch`
-- **統合テストの実行**: `deno task test:integration`
-- **全テストの実行**: `deno task test:all`
+- **ビルド**: `cargo build` (デバッグ) / `cargo build --release` (最適化)
+- **テストの実行**: `cargo test`
+- **safe-findの実行**: `cargo run --bin safe-find`
+- **safe-fdの実行**: `cargo run --bin safe-fd`
+- **フォーマット**: `cargo fmt`
+- **リント**: `cargo clippy`
+- **インストール**: `cargo install --path .` (ローカル) / `cargo install safe-find` (crates.io)
 
 ## プロジェクト構成
 
-- `safe-find.ts` - `find` コマンドの安全なラッパー実装
-- `safe-fd.ts` - `fd` コマンドの安全なラッパー実装
-- `safe-find_test.ts` - safe-findのunit test
-- `safe-fd_test.ts` - safe-fdのunit test
-- `integration-test.ts` - コマンド実行レベルのintegration test
-- `deno.jsonc` - Deno設定（JSR公開設定、実行可能ファイル定義、タスク）
-- `mise.toml` - ツールバージョン管理 (Deno 2.x)
-- `.github/workflows/` - CI/CD設定
+- `Cargo.toml` - Rustプロジェクト設定・依存関係・バイナリ定義
+- `src/lib.rs` - 共通ライブラリ（危険オプション検出ロジック・テスト）
+- `src/bin/safe-find.rs` - `safe-find` 実行可能ファイル
+- `src/bin/safe-fd.rs` - `safe-fd` 実行可能ファイル
+- `src/main.rs` - cargo initで自動生成されたファイル（使用していない）
+- `.github/workflows/` - CI/CD設定（Rust toolchain）
 
 ## 依存関係
 
-プロジェクトは最小限の依存関係を使用しています：
+**ゼロ依存関係** - 外部ライブラリを一切使用せず、Rust標準ライブラリのみで実装されています。これにより：
 
-- `@std/assert` - テストアサーション用のJSRライブラリ
+- **軽量**: バイナリサイズ361KB
+- **高速**: 瞬時起動
+- **安全**: 依存関係の脆弱性リスクなし
+- **互換性**: 追加インストール不要
 
 ## アーキテクチャ注記
 
-このプロジェクトは2つの独立した実行可能ファイル（`safe-find.ts`、`safe-fd.ts`）からなるツール集です。各ファイルは
-`deno.jsonc` の `bin`
-セクションで実行可能ファイルとして定義されています。各ラッパーは元のコマンドの引数を解析し、危険なオプションを除去してから安全な形で実行します。
+このプロジェクトは2つの独立した実行可能ファイル（`safe-find`, `safe-fd`）からなるツール集です。各バイナリは `Cargo.toml` の `[[bin]]` セクションで定義されています。
+
+- **共通ライブラリ**: `src/lib.rs` に危険オプション検出・コマンド実行ロジックを実装
+- **実行ファイル**: `src/bin/` 配下で各ツールの main 関数を実装
+- **サイズ最適化**: `Cargo.toml` の `[profile.release]` で積極的な最適化設定
+
+各ラッパーは元のコマンドの引数を解析し、危険なオプションを除去してから安全な形で実行します。
 
 ## セキュリティ機能
 
@@ -70,12 +70,16 @@ TypeScriptプロジェクトです。このプロジェクトは `find` と `fd`
 
 ## インストール・使用方法
 
-### JSRからのインストール
+### Crates.ioからのインストール
 
 ```bash
-# グローバルインストール
-deno install -g --allow-run jsr:@masinc/safe-find/safe-find
-deno install -g --allow-run jsr:@masinc/safe-find/safe-fd
+# グローバルインストール（推奨）
+cargo install safe-find
+
+# ローカルビルド・インストール
+git clone https://github.com/masinc/safe-find.git
+cd safe-find
+cargo install --path .
 ```
 
 ### 使用例
@@ -92,11 +96,10 @@ safe-fd --glob "*.ts" --type f
 
 ## CI/CD
 
-- **CI**: PR・pushで自動テスト実行（unit test + integration test）
-- **公開**: タグ作成時に自動でJSRに公開
-- **リリース**: タグ作成時にGitHub
-  Releasesにクロスプラットフォームバイナリを自動デプロイ
-- **テスト分離**: unit testとintegration testを分離して実行
+- **CI**: PR・pushで自動テスト実行（`cargo test`, `cargo fmt`, `cargo clippy`）
+- **公開**: タグ作成時に自動でcrates.ioに公開
+- **リリース**: タグ作成時にGitHub Releasesにクロスプラットフォームバイナリを自動デプロイ
+- **最適化**: リリースビルドでサイズ・パフォーマンス最適化（361KBバイナリ）
 
 ## リリース作業手順
 
@@ -105,14 +108,14 @@ safe-fd --glob "*.ts" --type f
 ```
 TodoWrite ツールで以下のTODOリストを作成：
 1. mainブランチの最新CI状態確認 (gh run list --branch main --limit 3)
-2. ローカル全テスト実行 (deno task test:all)
-3. フォーマットチェック (deno fmt --check)
-4. リントチェック (deno lint)
-5. deno.jsonc バージョン更新
+2. ローカル全テスト実行 (cargo test)
+3. フォーマットチェック (cargo fmt --check)
+4. リントチェック (cargo clippy -- -D warnings)
+5. Cargo.toml バージョン更新
 6. バージョン更新をコミット・push
 7. mainブランチのコミット後CI成功確認 (gh run list --branch main --limit 3)
 8. リリースタグ作成・push (git tag vX.Y.Z && git push origin vX.Y.Z)
-9. JSR公開ワークフロー実行確認 (gh run list --limit 3)
+9. crates.io公開ワークフロー実行確認 (gh run list --limit 3)
 10. 公開成功確認 (gh run view <run-id>)
 ```
 
@@ -130,8 +133,8 @@ TodoWrite ツールで以下のTODOリストを作成：
 2. **GitHub Releasesに自動公開**:
    - プラットフォーム別アーカイブ (tar.gz/zip)
    - インストール手順を含むリリースノート
-   - JSRパッケージとバイナリの両方を提供
+   - Crates.ioパッケージとバイナリの両方を提供
 
 3. **配布形式**:
-   - JSR: `deno install -g --allow-run jsr:@masinc/safe-find/safe-find`
-   - バイナリ: GitHub Releasesページからダウンロード
+   - Crates.io: `cargo install safe-find`
+   - バイナリ: GitHub Releasesページからダウンロード（361KBの軽量バイナリ）

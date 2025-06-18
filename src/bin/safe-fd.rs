@@ -1,16 +1,16 @@
+use safe_find::{check_dangerous_options, execute_command, FD_DANGEROUS_OPTIONS};
 use std::env;
 use std::process;
-use safe_find::{check_dangerous_options, execute_command, FD_DANGEROUS_OPTIONS};
 
 fn main() {
     let args: Vec<String> = env::args().skip(1).collect();
-    
+
     // Check for dangerous options
     if let Err(error) = check_dangerous_options(&args, FD_DANGEROUS_OPTIONS) {
         eprintln!("{}", error);
         process::exit(1);
     }
-    
+
     // Execute the original fd command
     match execute_command("fd", &args) {
         Ok(status) => {

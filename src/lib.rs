@@ -2,19 +2,16 @@ use std::collections::HashSet;
 use std::process::{Command, ExitStatus};
 
 /// Dangerous options for the find command
-pub const FIND_DANGEROUS_OPTIONS: &[&str] = &[
-    "-exec", "-execdir", "-ok", "-okdir", "-delete",
-];
+pub const FIND_DANGEROUS_OPTIONS: &[&str] = &["-exec", "-execdir", "-ok", "-okdir", "-delete"];
 
 /// Dangerous options for the fd command  
-pub const FD_DANGEROUS_OPTIONS: &[&str] = &[
-    "-x", "--exec", "-X", "--exec-batch", "-l", "--list-details",
-];
+pub const FD_DANGEROUS_OPTIONS: &[&str] =
+    &["-x", "--exec", "-X", "--exec-batch", "-l", "--list-details"];
 
 /// Check if any dangerous options are present in the arguments
 pub fn check_dangerous_options(args: &[String], dangerous_options: &[&str]) -> Result<(), String> {
     let dangerous_set: HashSet<&str> = dangerous_options.iter().copied().collect();
-    
+
     for arg in args {
         if dangerous_set.contains(arg.as_str()) {
             return Err(format!(
@@ -23,7 +20,7 @@ pub fn check_dangerous_options(args: &[String], dangerous_options: &[&str]) -> R
             ));
         }
     }
-    
+
     Ok(())
 }
 
