@@ -1,4 +1,4 @@
-name: Publish to JSR
+name: Release and Publish
 
 "on":
   push:
@@ -8,6 +8,40 @@ name: Publish to JSR
 jobs:
   test:
     uses: ./.github/workflows/test.yml
+
+  build-binaries:
+    runs-on: ubuntu-latest
+    needs: test
+    strategy:
+      matrix:
+        target:
+          - x86_64-unknown-linux-gnu
+          - x86_64-pc-windows-msvc
+          - x86_64-apple-darwin
+          - aarch64-apple-darwin
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v2.x
+
+      - name: Build safe-find binary
+        run: |
+          deno compile --allow-run --target ${{ matrix.target }} --output safe-find-${{ matrix.target }} safe-find.ts
+
+      - name: Build safe-fd binary
+        run: |
+          deno compile --allow-run --target ${{ matrix.target }} --output safe-fd-${{ matrix.target }} safe-fd.ts
+
+      - name: Upload binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: binaries-${{ matrix.target }}
+          path: |
+            safe-find-${{ matrix.target }}*
+            safe-fd-${{ matrix.target }}*
 
   publish:
     runs-on: ubuntu-latest
@@ -25,3 +59,71 @@ jobs:
 
       - name: Publish to JSR
         run: deno publish
+
+  release:
+    runs-on: ubuntu-latest
+    needs: [test, build-binaries]
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all binaries
+        uses: actions/download-artifact@v4
+        with:
+          path: binaries
+
+      - name: Create release archive
+        run: |
+          mkdir -p release
+          for target_dir in binaries/binaries-*; do
+            target=$(basename "$target_dir" | sed 's/binaries-//')
+            echo "Processing target: $target"
+
+            if [[ "$target" == *"windows"* ]]; then
+              zip -j "release/safe-find-${target}.zip" "$target_dir"/*
+            else
+              tar -czf "release/safe-find-${target}.tar.gz" -C "$target_dir" .
+            fi
+          done
+
+          ls -la release/
+
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.VERSION }}
+          name: Release ${{ steps.version.outputs.VERSION }}
+          body: |
+            ## 🚀 Release ${{ steps.version.outputs.VERSION }}
+
+            ### 📦 Installation Options
+
+            #### Via JSR (Recommended)
+            ```bash
+            deno install -g --allow-run jsr:@masinc/safe-find/safe-find
+            deno install -g --allow-run jsr:@masinc/safe-find/safe-fd
+            ```
+
+            #### Via Pre-built Binaries
+            Download the appropriate binary for your platform from the assets below.
+
+            ### 🛡️ Security Features
+            - Blocks dangerous execution options (`-exec`, `-execdir`, etc.)
+            - Maintains all safe file search functionality
+            - Zero performance overhead for search operations
+
+            ### 📋 Supported Platforms
+            - Linux (x86_64)
+            - Windows (x86_64)
+            - macOS (x86_64, ARM64)
+
+            For detailed usage instructions, see the [README](https://github.com/masinc/safe-find#readme).
+          files: |
+            release/*
+          draft: false
+          prerelease: false

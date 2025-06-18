@@ -94,6 +94,8 @@ safe-fd --glob "*.ts" --type f
 
 - **CI**: PR・pushで自動テスト実行（unit test + integration test）
 - **公開**: タグ作成時に自動でJSRに公開
+- **リリース**: タグ作成時にGitHub
+  Releasesにクロスプラットフォームバイナリを自動デプロイ
 - **テスト分離**: unit testとintegration testを分離して実行
 
 ## リリース作業手順
@@ -115,3 +117,21 @@ TodoWrite ツールで以下のTODOリストを作成：
 ```
 
 詳細な手順は `DEPLOYMENT.md` を参照してください。
+
+## バイナリリリース
+
+タグpush時に自動で以下が実行されます：
+
+1. **クロスプラットフォームバイナリビルド**:
+   - Linux (x86_64)
+   - Windows (x86_64)
+   - macOS (x86_64, ARM64)
+
+2. **GitHub Releasesに自動公開**:
+   - プラットフォーム別アーカイブ (tar.gz/zip)
+   - インストール手順を含むリリースノート
+   - JSRパッケージとバイナリの両方を提供
+
+3. **配布形式**:
+   - JSR: `deno install -g --allow-run jsr:@masinc/safe-find/safe-find`
+   - バイナリ: GitHub Releasesページからダウンロード
