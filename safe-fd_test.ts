@@ -6,7 +6,7 @@ Deno.test("checkDangerousOptions - throws on -x option", () => {
   assertThrows(
     () => checkDangerousOptions(input),
     Error,
-    "Dangerous option '-x' is not allowed for security reasons"
+    "Dangerous option '-x' is not allowed for security reasons",
   );
 });
 
@@ -15,7 +15,7 @@ Deno.test("checkDangerousOptions - throws on --exec option", () => {
   assertThrows(
     () => checkDangerousOptions(input),
     Error,
-    "Dangerous option '--exec' is not allowed for security reasons"
+    "Dangerous option '--exec' is not allowed for security reasons",
   );
 });
 
@@ -24,7 +24,7 @@ Deno.test("checkDangerousOptions - throws on -X option", () => {
   assertThrows(
     () => checkDangerousOptions(input),
     Error,
-    "Dangerous option '-X' is not allowed for security reasons"
+    "Dangerous option '-X' is not allowed for security reasons",
   );
 });
 
@@ -33,7 +33,7 @@ Deno.test("checkDangerousOptions - throws on --exec-batch option", () => {
   assertThrows(
     () => checkDangerousOptions(input),
     Error,
-    "Dangerous option '--exec-batch' is not allowed for security reasons"
+    "Dangerous option '--exec-batch' is not allowed for security reasons",
   );
 });
 
@@ -42,7 +42,7 @@ Deno.test("checkDangerousOptions - throws on combined -x option", () => {
   assertThrows(
     () => checkDangerousOptions(input),
     Error,
-    "Dangerous option '-x' is not allowed for security reasons"
+    "Dangerous option '-x' is not allowed for security reasons",
   );
 });
 
@@ -51,7 +51,7 @@ Deno.test("checkDangerousOptions - throws on --exec= option", () => {
   assertThrows(
     () => checkDangerousOptions(input),
     Error,
-    "Dangerous option '--exec' is not allowed for security reasons"
+    "Dangerous option '--exec' is not allowed for security reasons",
   );
 });
 
@@ -72,7 +72,7 @@ Deno.test("checkDangerousOptions - throws on -l option", () => {
   assertThrows(
     () => checkDangerousOptions(input),
     Error,
-    "Dangerous option '-l' is not allowed for security reasons"
+    "Dangerous option '-l' is not allowed for security reasons",
   );
 });
 
@@ -81,15 +81,23 @@ Deno.test("checkDangerousOptions - throws on --list-details option", () => {
   assertThrows(
     () => checkDangerousOptions(input),
     Error,
-    "Dangerous option '--list-details' is not allowed for security reasons"
+    "Dangerous option '--list-details' is not allowed for security reasons",
   );
 });
 
 Deno.test("checkDangerousOptions - throws on first dangerous option found", () => {
-  const input = ["pattern", "-x", "echo hello", "--exec", "echo world", "-t", "f"];
+  const input = [
+    "pattern",
+    "-x",
+    "echo hello",
+    "--exec",
+    "echo world",
+    "-t",
+    "f",
+  ];
   assertThrows(
     () => checkDangerousOptions(input),
     Error,
-    "Dangerous option '-x' is not allowed for security reasons"
+    "Dangerous option '-x' is not allowed for security reasons",
   );
 });

@@ -6,7 +6,7 @@ Deno.test("checkDangerousOptions - throws on -exec option", () => {
   assertThrows(
     () => checkDangerousOptions(input),
     Error,
-    "Dangerous option '-exec' is not allowed for security reasons"
+    "Dangerous option '-exec' is not allowed for security reasons",
   );
 });
 
@@ -15,7 +15,7 @@ Deno.test("checkDangerousOptions - throws on -execdir option", () => {
   assertThrows(
     () => checkDangerousOptions(input),
     Error,
-    "Dangerous option '-execdir' is not allowed for security reasons"
+    "Dangerous option '-execdir' is not allowed for security reasons",
   );
 });
 
@@ -24,7 +24,7 @@ Deno.test("checkDangerousOptions - throws on -ok option", () => {
   assertThrows(
     () => checkDangerousOptions(input),
     Error,
-    "Dangerous option '-ok' is not allowed for security reasons"
+    "Dangerous option '-ok' is not allowed for security reasons",
   );
 });
 
@@ -33,7 +33,7 @@ Deno.test("checkDangerousOptions - throws on -okdir option", () => {
   assertThrows(
     () => checkDangerousOptions(input),
     Error,
-    "Dangerous option '-okdir' is not allowed for security reasons"
+    "Dangerous option '-okdir' is not allowed for security reasons",
   );
 });
 
@@ -42,7 +42,7 @@ Deno.test("checkDangerousOptions - throws on -delete option", () => {
   assertThrows(
     () => checkDangerousOptions(input),
     Error,
-    "Dangerous option '-delete' is not allowed for security reasons"
+    "Dangerous option '-delete' is not allowed for security reasons",
   );
 });
 
@@ -66,12 +66,16 @@ Deno.test("checkDangerousOptions - allows basic find commands", () => {
 
 Deno.test("checkDangerousOptions - allows complex safe find commands", () => {
   const input = [
-    "/home", 
-    "-name", "*.log", 
-    "-type", "f", 
-    "-size", "+10M", 
-    "-mtime", "+7",
-    "-print"
+    "/home",
+    "-name",
+    "*.log",
+    "-type",
+    "f",
+    "-size",
+    "+10M",
+    "-mtime",
+    "+7",
+    "-print",
   ];
   // Should not throw
   checkDangerousOptions(input);
@@ -82,7 +86,7 @@ Deno.test("checkDangerousOptions - throws on first dangerous option found", () =
   assertThrows(
     () => checkDangerousOptions(input),
     Error,
-    "Dangerous option '-exec' is not allowed for security reasons"
+    "Dangerous option '-exec' is not allowed for security reasons",
   );
 });
 

@@ -6,11 +6,11 @@
 
 // Dangerous options that allow arbitrary command execution or destructive operations
 export const DANGEROUS_OPTIONS = new Set([
-  "-exec",     // Execute arbitrary commands
-  "-execdir",  // Execute commands in file's directory
-  "-ok",       // Interactive command execution
-  "-okdir",    // Interactive command execution in file's directory
-  "-delete",   // Delete matched files/directories - extremely dangerous
+  "-exec", // Execute arbitrary commands
+  "-execdir", // Execute commands in file's directory
+  "-ok", // Interactive command execution
+  "-okdir", // Interactive command execution in file's directory
+  "-delete", // Delete matched files/directories - extremely dangerous
 ]);
 
 export function checkDangerousOptions(args: string[]): void {
@@ -23,7 +23,7 @@ export function checkDangerousOptions(args: string[]): void {
     }
 
     const arg = args[i];
-    
+
     // Check for dangerous options
     if (DANGEROUS_OPTIONS.has(arg)) {
       throw new Error(
@@ -67,7 +67,9 @@ async function runSafeFind(args: string[]): Promise<void> {
     }
   } catch (error) {
     if (error instanceof Deno.errors.NotFound) {
-      console.error("Error: 'find' command not found. Please install findutils.");
+      console.error(
+        "Error: 'find' command not found. Please install findutils.",
+      );
       Deno.exit(1);
     } else {
       console.error(

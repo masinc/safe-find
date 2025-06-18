@@ -8,21 +8,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
           deno-version: v2.x
-      
+
       - name: Run tests
         run: deno task test
-      
+
       - name: Check formatting
         run: deno fmt --check
-      
+
       - name: Run linter
         run: deno lint
-      
+
       - name: Type check
         run: deno check **/*.ts
 
@@ -31,11 +31,11 @@ jobs:
     needs: test
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup Deno
         uses: denoland/setup-deno@v1
         with:
           deno-version: v2.x
-      
+
       - name: Run integration tests
         run: deno task test:integration
