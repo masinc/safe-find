@@ -42,7 +42,8 @@ jobs:
           files: |
             safe-find-${{ matrix.target }}*
             safe-fd-${{ matrix.target }}*
-          args: --best --lzma
+          args: >-
+            ${{ contains(matrix.target, 'apple-darwin') && '--best --lzma --force-macos --force-overwrite' || '--best --lzma' }}
 
       - name: Upload binaries
         uses: actions/upload-artifact@v4
