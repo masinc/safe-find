@@ -29,11 +29,20 @@ jobs:
 
       - name: Build safe-find binary
         run: |
-          deno compile --allow-run --target ${{ matrix.target }} --output safe-find-${{ matrix.target }} safe-find.ts
+          deno compile --allow-run --no-npm --no-remote --target ${{ matrix.target }} --output safe-find-${{ matrix.target }} safe-find.ts
 
       - name: Build safe-fd binary
         run: |
-          deno compile --allow-run --target ${{ matrix.target }} --output safe-fd-${{ matrix.target }} safe-fd.ts
+          deno compile --allow-run --no-npm --no-remote --target ${{ matrix.target }} --output safe-fd-${{ matrix.target }} safe-fd.ts
+
+      - name: Compress binaries with UPX
+        uses: crazy-max/ghaction-upx@v3
+        with:
+          version: latest
+          files: |
+            safe-find-${{ matrix.target }}*
+            safe-fd-${{ matrix.target }}*
+          args: --best --lzma
 
       - name: Upload binaries
         uses: actions/upload-artifact@v4
