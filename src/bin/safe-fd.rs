@@ -15,8 +15,11 @@ fn main() {
     let args: Vec<String> = env::args().skip(1).collect();
 
     // Show safe-fd info for help and version requests
-    if args.contains(&"--help".to_string()) || args.contains(&"-h".to_string()) ||
-       args.contains(&"--version".to_string()) || args.contains(&"-V".to_string()) {
+    if args.contains(&"--help".to_string())
+        || args.contains(&"-h".to_string())
+        || args.contains(&"--version".to_string())
+        || args.contains(&"-V".to_string())
+    {
         print_safe_fd_info();
     }
 
