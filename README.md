@@ -147,11 +147,68 @@ deno run --allow-run safe-fd.ts "*.md"
 
 ## 📚 Use Cases
 
+### 🤖 LLM/AI Tools (Primary Use Case)
+
+**The most important use case is providing safe file search capabilities to AI
+tools like Claude Code, ChatGPT Code Interpreter, and other LLM-based
+development assistants.**
+
+AI models often need to search and analyze file systems, but giving them access
+to dangerous execution commands poses significant security risks. safe-find and
+safe-fd provide the perfect solution - full search functionality without
+execution capabilities.
+
+#### Claude Code Integration
+
+Add this to your project's `CLAUDE.md` file to enable safe file operations:
+
+```markdown
+## Safe File Search for AI Assistants
+
+### Installation
+
+If fd is installed: `deno install -g --allow-run jsr:@masinc/safe-find/safe-fd`
+
+If fd is not available:
+`deno install -g --allow-run jsr:@masinc/safe-find/safe-find`
+
+### Claude Code Tool Configuration
+
+Add to your `.claude/settings.local.json`:
+
+{ "permissions": { "allow": [ "Bash(safe-find:_)", "Bash(safe-fd:_)" ], "deny":
+[ "Bash(find:_)", "Bash(fd:_)" ] } }
+
+### Usage
+
+Use `safe-fd` when fd is available, or `safe-find` when fd is not installed.
+Both tools block dangerous execution options while providing safe file search
+functionality.
+
+Basic search examples:
+
+- With fd: `safe-fd "*.ts" --type f`
+- Without fd: `safe-find . -name "*.ts" -type f`
+```
+
+#### Benefits for AI Development:
+
+- **Security**: Prevents accidental file deletion or command execution
+- **Functionality**: Maintains all search and filtering capabilities
+- **Performance**: Zero overhead for search operations
+- **Trust**: Allows confident delegation of file system tasks to AI
+- **Compliance**: Meets security requirements for automated development
+  environments
+
+### 🛠️ Other Use Cases
+
 - **CI/CD pipelines**: Prevent accidental command execution in automated scripts
 - **Shared servers**: Allow file search without execution risks
 - **Security-conscious environments**: Maintain find/fd functionality while
   blocking dangerous operations
 - **Teaching environments**: Safe way to learn find/fd without execution risks
+- **Development containers**: Secure file operations in containerized
+  development environments
 
 ## 📄 License
 
