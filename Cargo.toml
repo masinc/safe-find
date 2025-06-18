@@ -1,6 +1,6 @@
 [package]
 name = "safe-find"
-version = "0.2.3"
+version = "0.2.4"
 edition = "2021"
 license = "MIT"
 description = "Safe wrappers for find and fd commands that block dangerous execution options"
