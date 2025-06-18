@@ -16,10 +16,23 @@ jobs:
           override: true
           components: rustfmt, clippy
 
-      - name: Run tests
+      - name: Install fd command
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fd-find
+          sudo ln -sf /usr/bin/fdfind /usr/bin/fd
+
+      - name: Run unit tests
         uses: actions-rs/cargo@v1
         with:
           command: test
+          args: --lib
+
+      - name: Run integration tests
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --test integration_test
 
       - name: Check formatting
         uses: actions-rs/cargo@v1

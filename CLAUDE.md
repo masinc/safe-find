@@ -12,7 +12,9 @@
 ## 開発コマンド
 
 - **ビルド**: `cargo build` (デバッグ) / `cargo build --release` (最適化)
-- **テストの実行**: `cargo test`
+- **テストの実行**: `cargo test` (全テスト)
+- **ユニットテストの実行**: `cargo test --lib`
+- **統合テストの実行**: `cargo test --test integration_test`
 - **safe-findの実行**: `cargo run --bin safe-find`
 - **safe-fdの実行**: `cargo run --bin safe-fd`
 - **フォーマット**: `cargo fmt`
@@ -22,11 +24,11 @@
 ## プロジェクト構成
 
 - `Cargo.toml` - Rustプロジェクト設定・依存関係・バイナリ定義
-- `src/lib.rs` - 共通ライブラリ（危険オプション検出ロジック・テスト）
+- `src/lib.rs` - 共通ライブラリ（危険オプション検出ロジック・ユニットテスト）
 - `src/bin/safe-find.rs` - `safe-find` 実行可能ファイル
 - `src/bin/safe-fd.rs` - `safe-fd` 実行可能ファイル
-- `src/main.rs` - cargo initで自動生成されたファイル（使用していない）
-- `.github/workflows/` - CI/CD設定（Rust toolchain）
+- `tests/integration_test.rs` - 統合テスト（コマンド実行レベルのテスト）
+- `.github/workflows/` - CI/CD設定（Rust toolchain、ユニット＋統合テスト）
 
 ## 依存関係
 
@@ -96,7 +98,7 @@ safe-fd --glob "*.ts" --type f
 
 ## CI/CD
 
-- **CI**: PR・pushで自動テスト実行（`cargo test`, `cargo fmt`, `cargo clippy`）
+- **CI**: PR・pushで自動テスト実行（ユニットテスト＋統合テスト、`cargo fmt`, `cargo clippy`）
 - **公開**: タグ作成時に自動でcrates.ioに公開
 - **リリース**: タグ作成時にGitHub Releasesにクロスプラットフォームバイナリを自動デプロイ
 - **最適化**: リリースビルドでサイズ・パフォーマンス最適化（361KBバイナリ）
@@ -108,7 +110,7 @@ safe-fd --glob "*.ts" --type f
 ```
 TodoWrite ツールで以下のTODOリストを作成：
 1. mainブランチの最新CI状態確認 (gh run list --branch main --limit 3)
-2. ローカル全テスト実行 (cargo test)
+2. ローカル全テスト実行 (cargo test) - ユニット＋統合テスト
 3. フォーマットチェック (cargo fmt --check)
 4. リントチェック (cargo clippy -- -D warnings)
 5. Cargo.toml バージョン更新
