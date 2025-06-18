@@ -160,13 +160,17 @@ MIT License
 ## 🔗 Links
 
 ### Project Links
+
 - [JSR Package](https://jsr.io/@masinc/safe-find)
 - [GitHub Repository](https://github.com/masinc/safe-find)
 - [Issues & Bug Reports](https://github.com/masinc/safe-find/issues)
 
 ### Original Commands
-- [find command](https://www.gnu.org/software/findutils/manual/html_mono/find.html) - GNU findutils documentation
-- [fd command](https://github.com/sharkdp/fd) - A simple, fast and user-friendly alternative to find
+
+- [find command](https://www.gnu.org/software/findutils/manual/html_mono/find.html) -
+  GNU findutils documentation
+- [fd command](https://github.com/sharkdp/fd) - A simple, fast and user-friendly
+  alternative to find
 
 ## ⭐ Show Your Support
 

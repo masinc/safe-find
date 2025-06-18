@@ -12,7 +12,8 @@ TypeScriptプロジェクトです。このプロジェクトは `find` と `fd`
 系オプション（`-exec`, `-execdir`, `-delete`
 など）を無効化し、セキュリティリスクを軽減します。
 
-プロジェクトは `mise.toml` で指定されているDeno 2.xをランタイム管理に使用し、JSRで公開されています。
+プロジェクトは `mise.toml` で指定されているDeno
+2.xをランタイム管理に使用し、JSRで公開されています。
 
 ## 開発コマンド
 
@@ -52,20 +53,25 @@ TypeScriptプロジェクトです。このプロジェクトは `find` と `fd`
 コマンドの安全なラッパーを提供することです：
 
 ### safe-find
+
 - **危険なオプションの無効化**: `-exec`, `-execdir`, `-ok`, `-okdir`, `-delete`
   などの任意コマンド実行・破壊的操作を可能にするオプションをフィルタリング
 
-### safe-fd  
-- **危険なオプションの無効化**: `-x`, `--exec`, `-X`, `--exec-batch`, `-l`, `--list-details`
-  などの任意コマンド実行を可能にするオプションをフィルタリング
+### safe-fd
+
+- **危険なオプションの無効化**: `-x`, `--exec`, `-X`, `--exec-batch`, `-l`,
+  `--list-details` などの任意コマンド実行を可能にするオプションをフィルタリング
 
 ### 共通機能
-- **安全なファイル検索**: ファイル検索機能は保持しつつ、セキュリティリスクのある機能を除去
+
+- **安全なファイル検索**:
+  ファイル検索機能は保持しつつ、セキュリティリスクのある機能を除去
 - **透明性**: 元のコマンドの使いやすさを維持しながら、危険な機能のみを制限
 
 ## インストール・使用方法
 
 ### JSRからのインストール
+
 ```bash
 # グローバルインストール
 deno install -g --allow-run jsr:@masinc/safe-find/safe-find
@@ -73,6 +79,7 @@ deno install -g --allow-run jsr:@masinc/safe-find/safe-fd
 ```
 
 ### 使用例
+
 ```bash
 # safe-find
 safe-find . -name "*.txt" -type f
@@ -88,3 +95,23 @@ safe-fd --glob "*.ts" --type f
 - **CI**: PR・pushで自動テスト実行（unit test + integration test）
 - **公開**: タグ作成時に自動でJSRに公開
 - **テスト分離**: unit testとintegration testを分離して実行
+
+## リリース作業手順
+
+リリースを行う際は、必ずTodoWriteツールを使用して以下のタスクリストを作成し、順次実行してください：
+
+```
+TodoWrite ツールで以下のTODOリストを作成：
+1. mainブランチの最新CI状態確認 (gh run list --branch main --limit 3)
+2. ローカル全テスト実行 (deno task test:all)
+3. フォーマットチェック (deno fmt --check)
+4. リントチェック (deno lint)
+5. deno.jsonc バージョン更新
+6. バージョン更新をコミット・push
+7. mainブランチのコミット後CI成功確認 (gh run list --branch main --limit 3)
+8. リリースタグ作成・push (git tag vX.Y.Z && git push origin vX.Y.Z)
+9. JSR公開ワークフロー実行確認 (gh run list --limit 3)
+10. 公開成功確認 (gh run view <run-id>)
+```
+
+詳細な手順は `DEPLOYMENT.md` を参照してください。

@@ -1,6 +1,6 @@
 {
   "name": "@masinc/safe-find",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "license": "MIT",
   "exports": {
     "./safe-find": "./safe-find.ts",

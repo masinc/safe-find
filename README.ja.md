@@ -16,7 +16,8 @@ safe-fd "*.js"
 
 ## 🔒 なぜsafe-findが必要？
 
-標準の `find` と `fd` コマンドには、任意のコマンドを実行できる強力だが危険なオプションがあります：
+標準の `find` と `fd`
+コマンドには、任意のコマンドを実行できる強力だが危険なオプションがあります：
 
 ```bash
 # ⚠️ 危険 - 任意のコマンドを実行可能
@@ -163,8 +164,10 @@ MITライセンス
 
 ### 元のコマンド
 
-- [findコマンド](https://www.gnu.org/software/findutils/manual/html_mono/find.html) - GNU findutilsドキュメント
-- [fdコマンド](https://github.com/sharkdp/fd) - findのシンプルで高速なユーザーフレンドリーな代替
+- [findコマンド](https://www.gnu.org/software/findutils/manual/html_mono/find.html) -
+  GNU findutilsドキュメント
+- [fdコマンド](https://github.com/sharkdp/fd) -
+  findのシンプルで高速なユーザーフレンドリーな代替
 
 ## ⭐ サポートを表示
 
