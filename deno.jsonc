@@ -1,7 +1,7 @@
 {
   "tasks": {
-    "safe-find": "deno run ./safe-find.ts",
-    "safe-fd": "deno run ./safe-fd.ts",
+    "safe-find": "deno run --allow-run ./safe-find.ts",
+    "safe-fd": "deno run --allow-run ./safe-fd.ts",
     "test": "deno test",
     "test:watch": "deno test --watch"
   },
