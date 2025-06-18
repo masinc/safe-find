@@ -1,7 +1,11 @@
 {
   "name": "@masinc/safe-find",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "MIT",
+  "exports": {
+    "./safe-find": "./safe-find.ts",
+    "./safe-fd": "./safe-fd.ts"
+  },
   "bin": {
     "safe-find": "./safe-find.ts",
     "safe-fd": "./safe-fd.ts"
