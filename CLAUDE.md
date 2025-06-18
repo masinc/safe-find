@@ -9,27 +9,30 @@
 TypeScriptプロジェクトです。このプロジェクトは `find` と `fd`
 コマンドの安全なラッパーである `safe-find` と `safe-fd`
 を提供します。これらのラッパーは、元のコマンドの危険な `-exec`
-系オプション（`-exec`, `-execdir`
+系オプション（`-exec`, `-execdir`, `-delete`
 など）を無効化し、セキュリティリスクを軽減します。
 
-プロジェクトは `mise.toml` で指定されているDeno
-2.xをランタイム管理に使用しています。
+プロジェクトは `mise.toml` で指定されているDeno 2.xをランタイム管理に使用し、JSRで公開されています。
 
 ## 開発コマンド
 
-- **safe-findの実行**: `deno run safe-find.ts`
-- **safe-fdの実行**: `deno run safe-fd.ts`
+- **safe-findの実行**: `deno run --allow-run safe-find.ts`
+- **safe-fdの実行**: `deno run --allow-run safe-fd.ts`
 - **テストの実行**: `deno task test` (または `deno test`)
 - **テストのウォッチモード**: `deno task test:watch`
+- **統合テストの実行**: `deno task test:integration`
+- **全テストの実行**: `deno task test:all`
 
 ## プロジェクト構成
 
 - `safe-find.ts` - `find` コマンドの安全なラッパー実装
 - `safe-fd.ts` - `fd` コマンドの安全なラッパー実装
-- `safe-find_test.ts` - safe-findのテストファイル
-- `safe-fd_test.ts` - safe-fdのテストファイル
-- `deno.jsonc` - Deno設定（実行可能ファイル定義、タスク、インポートマッピング）
+- `safe-find_test.ts` - safe-findのunit test
+- `safe-fd_test.ts` - safe-fdのunit test
+- `integration-test.ts` - コマンド実行レベルのintegration test
+- `deno.jsonc` - Deno設定（JSR公開設定、実行可能ファイル定義、タスク）
 - `mise.toml` - ツールバージョン管理 (Deno 2.x)
+- `.github/workflows/` - CI/CD設定
 
 ## 依存関係
 
@@ -48,8 +51,40 @@ TypeScriptプロジェクトです。このプロジェクトは `find` と `fd`
 このプロジェクトの主要な目的は、`find` と `fd`
 コマンドの安全なラッパーを提供することです：
 
-- **危険なオプションの無効化**: `-exec`, `-execdir`, `-ok`, `-okdir`
+### safe-find
+- **危険なオプションの無効化**: `-exec`, `-execdir`, `-ok`, `-okdir`, `-delete`
+  などの任意コマンド実行・破壊的操作を可能にするオプションをフィルタリング
+
+### safe-fd  
+- **危険なオプションの無効化**: `-x`, `--exec`, `-X`, `--exec-batch`, `-l`, `--list-details`
   などの任意コマンド実行を可能にするオプションをフィルタリング
-- **安全なファイル検索**:
-  ファイル検索機能は保持しつつ、セキュリティリスクのある機能を除去
+
+### 共通機能
+- **安全なファイル検索**: ファイル検索機能は保持しつつ、セキュリティリスクのある機能を除去
 - **透明性**: 元のコマンドの使いやすさを維持しながら、危険な機能のみを制限
+
+## インストール・使用方法
+
+### JSRからのインストール
+```bash
+# グローバルインストール
+deno install -g --allow-run jsr:@masinc/safe-find/safe-find
+deno install -g --allow-run jsr:@masinc/safe-find/safe-fd
+```
+
+### 使用例
+```bash
+# safe-find
+safe-find . -name "*.txt" -type f
+safe-find /home -name "*.log" -size +1M
+
+# safe-fd
+safe-fd "*.js"
+safe-fd --glob "*.ts" --type f
+```
+
+## CI/CD
+
+- **CI**: PR・pushで自動テスト実行（unit test + integration test）
+- **公開**: タグ作成時に自動でJSRに公開
+- **テスト分離**: unit testとintegration testを分離して実行
