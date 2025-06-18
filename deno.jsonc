@@ -1,0 +1,15 @@
+{
+  "tasks": {
+    "safe-find": "deno run ./safe-find.ts",
+    "safe-fd": "deno run ./safe-fd.ts",
+    "test": "deno test",
+    "test:watch": "deno test --watch"
+  },
+  "imports": {
+    "@std/assert": "jsr:@std/assert@1"
+  },
+  "bin": {
+    "safe-find": "./safe-find.ts",
+    "safe-fd": "./safe-fd.ts"
+  }
+}
