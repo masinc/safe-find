@@ -51,7 +51,8 @@ safe-fd "*.tmp" -x rm              # ❌ Blocked
 
 ### Prerequisites
 
-- [Rust](https://rustup.rs/) (for building from source) or just use pre-built binaries
+- [Rust](https://rustup.rs/) (for building from source) or just use pre-built
+  binaries
 
 ### Install from Crates.io (Recommended)
 
@@ -70,7 +71,8 @@ cargo install --path .
 
 ### Pre-built Binaries
 
-Download platform-specific binaries (361KB each) from [GitHub Releases](https://github.com/masinc/safe-find/releases).
+Download platform-specific binaries (361KB each) from
+[GitHub Releases](https://github.com/masinc/safe-find/releases).
 
 ## 🔧 Usage
 
@@ -182,9 +184,7 @@ Add this to your project's `CLAUDE.md` file to enable safe file operations:
 
 ### Installation
 
-```bash
-cargo install safe-find
-```
+`cargo install safe-find`
 
 ### Claude Code Tool Configuration
 

@@ -177,9 +177,7 @@ AIアシスタンスで安全なファイル操作を有効にするため、プ
 
 ### インストール
 
-```bash
-cargo install safe-find
-```
+`cargo install safe-find`
 
 ### Claude Code ツール設定
 
