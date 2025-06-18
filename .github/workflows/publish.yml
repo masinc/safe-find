@@ -10,15 +10,19 @@ jobs:
     uses: ./.github/workflows/test.yml
 
   build-binaries:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     needs: test
     strategy:
       matrix:
-        target:
-          - x86_64-unknown-linux-gnu
-          - x86_64-pc-windows-msvc
-          - x86_64-apple-darwin
-          - aarch64-apple-darwin
+        include:
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+          - target: x86_64-apple-darwin
+            os: macos-latest
+          - target: aarch64-apple-darwin
+            os: macos-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -35,10 +39,17 @@ jobs:
           command: build
           args: --release --target ${{ matrix.target }}
 
-      - name: Copy binaries to root
+      - name: Copy binaries to root (Unix)
+        if: runner.os != 'Windows'
         run: |
-          cp target/${{ matrix.target }}/release/safe-find* ./safe-find-${{ matrix.target }}
-          cp target/${{ matrix.target }}/release/safe-fd* ./safe-fd-${{ matrix.target }}
+          cp target/${{ matrix.target }}/release/safe-find ./safe-find-${{ matrix.target }}
+          cp target/${{ matrix.target }}/release/safe-fd ./safe-fd-${{ matrix.target }}
+
+      - name: Copy binaries to root (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          copy target\${{ matrix.target }}\release\safe-find.exe safe-find-${{ matrix.target }}.exe
+          copy target\${{ matrix.target }}\release\safe-fd.exe safe-fd-${{ matrix.target }}.exe
 
       - name: Upload binaries
         uses: actions/upload-artifact@v4
